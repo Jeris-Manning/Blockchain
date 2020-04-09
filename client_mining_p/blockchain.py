@@ -12,9 +12,9 @@ class Blockchain(object):
         self.current_transactions = []
 
         # Create the genesis block
-        self.new_block(previous_hash=1, proof=100)
+        self.new_block(previous_hash=1, miner="Magic", proof=100)
 
-    def new_block(self, proof, previous_hash=None):
+    def new_block(self, proof, previous_hash=None, miner=None ):
         """
         Create a new Block in the Blockchain
 
@@ -44,6 +44,7 @@ class Blockchain(object):
             'proof': proof,
             'previous_hash': previous_hash or self.hash(self.chain[-1]),
             'hash': current_hash,
+            'miner': miner
         }
 
         # Reset the current list of transactions
@@ -88,11 +89,9 @@ class Blockchain(object):
 
     @property
     def last_block(self):
-        # goose_block = json.dumps(self.chain[-1], sort_keys=True)
-        goose_block = self.chain[-1]
-        print(goose_block, "GOOSE BLOCKER")
-        return goose_block
-        # return self.chain[-1]
+
+        return self.chain[-1]
+
 
 
     @staticmethod
@@ -133,9 +132,21 @@ def mine():
     # proof = blockchain.proof_of_work()
 
     # Forge the new Block by adding it to the chain with the proof
+
+
+
+
     proof = data['proof']
+    block_string = json.dumps(blockchain.last_block, sort_keys=True)
+    miner = data['id']
+
+    if blockchain.valid_proof(block_string, proof):
+        print("Looks good on this end")
+    else:
+        return jsonify("This isn't a valid proof"), 400
+
     previous_hash = blockchain.hash(blockchain.last_block)
-    block = blockchain.new_block(proof, previous_hash)
+    block = blockchain.new_block(proof, previous_hash, miner)
 
 
     response = {
@@ -144,6 +155,7 @@ def mine():
         'transactions': block['transactions'],
         'proof': block['proof'],
         'previous_hash': block['previous_hash'],
+        'miner': block['miner']
     }
 
     return jsonify(response), 200

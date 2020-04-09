@@ -41,7 +41,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         node = sys.argv[1]
     else:
-        node = "http://localhost:5000"
+        node = "http://127.0.0.1:5000"
 
     # Load ID
     f = open("my_id.txt", "r")
@@ -69,6 +69,7 @@ if __name__ == '__main__':
         # When found, POST it to the server {"proof": new_proof, "id": id}
 
         payload = dict(proof = new_proof, id = id)
+        print(payload)
 
         r = requests.post(url=node + "/mine", json=payload)
 
@@ -81,7 +82,9 @@ if __name__ == '__main__':
         if data['message'] == "New Block Forged":
            coins += 1
            print(data['message'])
-           print("You mined a coin!")
+           print(f'{data["miner"]}mined a coin!')
+           print(f'You have {coins} coins!')
+           print('')
         else:
             print(data['message'])
 
